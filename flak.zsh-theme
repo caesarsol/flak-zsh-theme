@@ -70,12 +70,6 @@ flak_git_branch () {
   echo -n "${REF#refs/heads/}"
 }
 
-# Very fast `rbenv version-name`
-RBENV_VERSION=$(rbenv --version | cut -d' ' -f2)
-flak_rbenv_version () {
-  cat $(/usr/local/Cellar/rbenv/${RBENV_VERSION}/libexec/rbenv-version-file)
-}
-
 fill_space () {
   local STR="$1$2"
   local ZERO='%([BSUbfksu]|([FB]|){*})'
@@ -117,13 +111,15 @@ build_prompt() {
     rgbecho 555
   }
   right_prompt() {
-    #rgbecho 203 "nd-$(nvm_prompt_info)"
-    #rgbecho 555 " "
+    rgbecho 555 "$(git_prompt_info)"
+    rgbecho 555 " "
     rgbecho 555 "$(flak_git_branch)"
     rgbecho 555 " "
     rgbecho 555 "$(flak_git_status)"
     rgbecho 555 " "
-    rgbecho 510 "rb-$(flak_rbenv_version)"
+    rgbecho 203 "$(nvm_prompt_info)"
+    rgbecho 555 " "
+    rgbecho 510 "$(ruby_prompt_info)"
     rgbecho 555 " "
   }
   LEFT=$(left_prompt)
