@@ -12,10 +12,15 @@ source "$THIS_DIR/flak.colors.zsh"
 ### Git
 
 flak_git_status() {
-  local STATUS="$(git status --branch --short --porcelain 2>/dev/null)"
-  local -a FILES_STATUS; FILES_STATUS=( $(echo $STATUS | egrep -o '^[MARCDU\? ][MARCDU\? ]' | tr ' ' '-' ) )
-  local SYNC_STATUS="$(echo $STATUS | grep -oE '^## ')"
-  local BRANCH="$(echo $STATUS | grep '##' | grep -oE '[a-z/]+' | head -n1)"
+  local STATUS
+  STATUS="$(git status --branch --short --porcelain 2>/dev/null)"
+  local -a FILES_STATUS
+  FILES_STATUS=( $(echo "$STATUS" | egrep -o '^[MARCDU\? ][MARCDU\? ]' | tr ' ' '-' ) )
+  local SYNC_STATUS
+  SYNC_STATUS="$(echo "$STATUS" | grep -oE '^## ')"
+  local BRANCH
+  BRANCH="$(echo "$STATUS" | grep '##' | grep -oE '[a-z/]+' | head -n1)"
+
   local N_MODIFIED=0
   local N_ADDED=0
   local N_DELETED=0
@@ -73,8 +78,8 @@ flak_rbenv_version () {
 
 fill_space () {
   local STR="$1$2"
-  local zero='%([BSUbfksu]|([FB]|){*})'
-  local LENGTH=${#${(S%%)STR//$~zero/}}
+  local ZERO='%([BSUbfksu]|([FB]|){*})'
+  local LENGTH=${#${(S%%)STR//$~ZERO/}}
   local SPACES=""
   (( LENGTH = ${COLUMNS} - $LENGTH - 1 ))
 
