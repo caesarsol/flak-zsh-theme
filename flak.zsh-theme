@@ -95,36 +95,38 @@ mtime() {
   echo $(( E - B ))
 }
 
+flak_left_prompt() {
+  greybgecho 3
+  rgbecho 555 "["
+  rgbecho 550 "%*" # %* - time HH:MM:SS
+  rgbecho 555 "]"
+  rgbecho 555 " "
+  rgbecho 005 "%n" # %n - username
+  rgbecho 555 "@"
+  rgbecho 045 "%m" # %m - machine name
+  rgbecho 555 ":"
+  rgbecho 030 "%~" # %~ - current path
+  rgbecho 555
+}
 
-build_prompt() {
-  left_prompt() {
-    greybgecho 3
-    rgbecho 555 "["
-    rgbecho 550 "%*" # %* - time HH:MM:SS
-    rgbecho 555 "]"
-    rgbecho 555 " "
-    rgbecho 005 "%n" # %n - username
-    rgbecho 555 "@"
-    rgbecho 045 "%m" # %m - machine name
-    rgbecho 555 ":"
-    rgbecho 030 "%~" # %~ - current path
-    rgbecho 555
-  }
-  right_prompt() {
-    rgbecho 555 "$(git_prompt_info)"
-    rgbecho 555 " "
-    rgbecho 555 "$(flak_git_branch)"
-    rgbecho 555 " "
-    rgbecho 555 "$(flak_git_status)"
-    rgbecho 555 " "
-    rgbecho 203 "$(nvm_prompt_info)"
-    rgbecho 555 " "
-    rgbecho 510 "$(ruby_prompt_info)"
-    rgbecho 555 " "
-  }
-  LEFT=$(left_prompt)
+flak_right_prompt() {
+  rgbecho 555 "$(flak_git_branch)"
+  rgbecho 555 " "
+  rgbecho 555 "$(git_remote_status)"
+  rgbecho 555 " "
+  rgbecho 555 "$(flak_git_status)"
+  rgbecho 555 " "
+  rgbecho 203 "$(nvm_prompt_info)"
+  rgbecho 555 " "
+  rgbecho 510 "$(ruby_prompt_info)"
+  rgbecho 555 " "
+  greybgecho 0
+}
+
+flak_build_prompt() {
+  LEFT=$(flak_left_prompt)
   if (( COLUMNS > 100 )); then
-    RIGHT=$(right_prompt)
+    RIGHT=$(flak_right_prompt)
     echo -n "$LEFT"
     fill_space "$RIGHT" "$LEFT"
     echo -n "$RIGHT"
@@ -133,12 +135,10 @@ build_prompt() {
     echo -n "$LEFT"
     fill_space "$LEFT"
   fi
-  rgbecho 555
-  greybgecho 0
 }
 
 benchmark() {
-  echo "build_prompt:           ms $(mtime build_prompt)"
+  echo "flak_build_prompt:           ms $(mtime flak_build_prompt)"
   echo "                           ==="
   echo " '- flak_git_status:    ms $(mtime flak_git_status)"
   echo " '- flak_git_branch:    ms $(mtime flak_git_branch)"
@@ -148,5 +148,10 @@ benchmark() {
 setopt prompt_subst
 
 PROMPT='
-$(build_prompt)
+$(flak_build_prompt)
 $(rgb 050)%# %{$reset_color%}'
+
+ZSH_THEME_GIT_PROMPT_EQUAL_REMOTE="%{$fg[green]%}="
+ZSH_THEME_GIT_PROMPT_AHEAD_REMOTE="%{$fg[blue]%}^"
+ZSH_THEME_GIT_PROMPT_BEHIND_REMOTE="%{$fg[red]%}v"
+ZSH_THEME_GIT_PROMPT_DIVERGED_REMOTE="$ZSH_THEME_GIT_PROMPT_AHEAD_REMOTE$ZSH_THEME_GIT_PROMPT_BEHIND_REMOTE"
